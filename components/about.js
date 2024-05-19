@@ -1,29 +1,38 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import {
+  StyleSheet, View, Text, Image,
+} from 'react-native';
 
-const About = () => {
+function About() {
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.image}
-        source={{ uri: 'https://facebook.github.io/react/logo-og.png' }}
-      />
-      <Text>
+      <Text style={styles.text}>
         This app was written in React-Native.
       </Text>
+      <Image
+        style={styles.image}
+        source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/2300px-React-icon.svg.png' }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.7,
     justifyContent: 'space-around',
     alignItems: 'center',
+    marginTop: 100,
   },
   image: {
     width: 400,
     height: 300,
+  },
+  text: {
+    textShadowColor: 'black',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
+    fontSize: '20px',
   },
 });
 

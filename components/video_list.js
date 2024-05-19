@@ -1,8 +1,7 @@
 /* eslint-disable react/destructuring-assignment */
-import React, { useState, useEffect }  from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchBar } from 'react-native-elements';
 import {
-  ActivityIndicator,
   StyleSheet,
   View,
   Image,
@@ -11,8 +10,72 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import youtubeSearch from '../services/youtube-api';
 
-// import youtubeSearch from '../services/youtube-api';
+function VideoCell({ video }) {
+  const navigation = useNavigation();
+
+  return (
+    <TouchableHighlight
+      onPress={() => {
+        navigation.navigate('Detail', { video });
+      }}
+      underlayColor="orange"
+    >
+      <View>
+        <View style={styles.container}>
+          <Image
+            source={{ uri: video.snippet.thumbnails.default.url }}
+            style={styles.thumbnail}
+          />
+          <View style={styles.rightContainer}>
+            <Text style={styles.title}>{video.snippet.title}</Text>
+            <Text style={styles.subtitle}>{video.snippet.description}</Text>
+          </View>
+        </View>
+        <View style={styles.separator} />
+      </View>
+    </TouchableHighlight>
+  );
+}
+
+function VideoList() {
+  const [query, setQuery] = useState('');
+  const [dataSource, setDataSource] = useState([]);
+
+  // add useEffect here
+  useEffect(() => {
+    youtubeSearch(query)
+      .then((responseData) => {
+        setDataSource(responseData);
+      }).catch((error) => {
+        console.log(error);
+      });
+  }, [query]);
+
+  return (
+    <View>
+      <SearchBar
+        showsCancelButton={false}
+        onChangeText={(newQuery) => {
+          setQuery(newQuery);
+        }}
+        value={query}
+        inputContainerStyle={{ backgroundColor: 'white', borderRadius: '15px' }}
+        leftIconContainerStyle={{ marginLeft: '5%' }}
+        containerStyle={{ backgroundColor: '#c4302b', borderBottomColor: 'transparent', borderTopColor: 'transparent' }}
+        placeholder="Search video..."
+      />
+
+      <FlatList
+        data={dataSource}
+        renderItem={({ item }) => { return <VideoCell video={item} />; }}
+        keyExtractor={(item) => item.snippet.thumbnails.default.url}
+        style={styles.listView}
+      />
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -53,57 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const VideoCell = ({ video }) => {
-  const navigation = useNavigation();
-
-  return (
-    <TouchableHighlight 
-      onPress={() => { 
-        navigation.navigate('Detail', { video })
-      }} 
-      underlayColor="orange"
-    >
-      <View>
-        <View style={styles.container}>
-          <Image
-            source={{ uri: video.snippet.thumbnails.default.url }}
-            style={styles.thumbnail}
-          />
-          <View style={styles.rightContainer}>
-            <Text style={styles.title}>{video.snippet.title}</Text>
-            <Text style={styles.subtitle}>{video.snippet.description}</Text>
-          </View>
-        </View>
-        <View style={styles.separator} />
-      </View>
-    </TouchableHighlight>
-  );
-}
-
-const VideoList = () => {
-  const [query, setQuery] = useState('');
-  const [dataSource, setDataSource] = useState([]);
-  
-  // add useEffect here
-
-  return (
-    <View>
-      <SearchBar
-        showsCancelButton={false}
-        onChangeText={(newQuery) => {
-          setQuery(newQuery);
-        }}
-        value={query}
-        inputContainerStyle={{ backgroundColor: 'white' }}
-        containerStyle={{ backgroundColor: "#c4302b" }}
-      />
-
-      <FlatList
-        data={dataSource}
-        renderItem={({ item }) => { return <VideoCell video={item} /> }}
-        keyExtractor={(item) => item.snippet.thumbnails.default.url}
-        style={styles.listView}
-      />
-    </View>
-  );
-}
+export default VideoList;
